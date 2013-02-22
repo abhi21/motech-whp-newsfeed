@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang=en>
+<head>
+	<meta charset=utf-8>
+	<title>couch test</title>
+	
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io.connect('http://localhost:9000');
+			socket.on('update', function (data) {
+				var d = JSON.parse(data);
+				var innerHTML = render(d);
+				var p = document.createElement('p');
+				var cont = document.createTextNode(innerHTML);
+				p.appendChild(cont);
+				$("#innerBox").prepend(innerHTML);
+		});
+		
+		function render(data){
+			if(data.subject){ //motech event
+				if(data.subject == 'http_request'){
+					if(data.parameters.data.reminderType && data.parameters.data.reminderType == 'ADHERENCE_WINDOW_APPROACHING'){
+						return "<div>Adherence Window Approaching Reminder sent to " + data.parameters.data.providerId + " on " + data.parameters.data.attemptTime + "</div>";
+					}
+				}
+			}
+		}
+		
+	</script>
+	
+	<style type="text/css" media="screen">
+		* {
+			margin:0px;
+			padding:0px;
+		}
+		
+		body {
+			font-family: Verdana, sans-serif;
+		}
+	
+		p {
+			padding:10px 10px;
+		}
+	</style>
+</head>
+<body>
+	<div id="box">
+		<div id="innerBox">
+
+		</div>
+	</div>
+</body>
+</html>
