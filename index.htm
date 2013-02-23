@@ -1,11 +1,30 @@
-<!doctype html>
-<html lang=en>
-<head>
+<!DOCTYPE html>
+<html>
+<head lang=en>
 	<meta charset=utf-8>
 	<title>couch test</title>
+
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 	
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+		(function(a){if(!a.omr){a.omr=new Object()}a.omr.totemticker=function(c,b){var d=this;d.el=c;d.$el=a(c);d.$el.data("omr.totemticker",d);d.init=function(){d.options=a.extend({},a.omr.totemticker.defaultOptions,b);d.ticker;d.format_ticker();d.setup_nav();d.start_interval()};d.start_interval=function(){clearInterval(d.ticker);d.ticker=setInterval(function(){d.$el.find("li:first").animate({marginTop:"-"+d.options.row_height,},d.options.speed,function(){a(this).detach().css("marginTop","0").appendTo(d.$el)})},d.options.interval)};d.reset_interval=function(){clearInterval(d.ticker);d.start_interval()};d.stop_interval=function(){clearInterval(d.ticker)};d.format_ticker=function(){if(typeof(d.options.max_items)!="undefined"&&d.options.max_items!=null){var f=d.options.row_height.replace(/px/i,"");var e=f*d.options.max_items;d.$el.css({height:e+"px",overflow:"hidden",})}else{d.$el.css({overflow:"hidden",})}};d.setup_nav=function(){if(typeof(d.options.stop)!="undefined"&&d.options.stop!=null){a(d.options.stop).click(function(){d.stop_interval();return false})}if(typeof(d.options.start)!="undefined"&&d.options.start!=null){a(d.options.start).click(function(){d.start_interval();return false})}if(typeof(d.options.previous)!="undefined"&&d.options.previous!=null){a(d.options.previous).click(function(){d.$el.find("li:last").detach().prependTo(d.$el).css("marginTop","-"+d.options.row_height);d.$el.find("li:first").animate({marginTop:"0px",},d.options.speed,function(){d.reset_interval()});return false})}if(typeof(d.options.next)!="undefined"&&d.options.next!=null){a(d.options.next).click(function(){d.$el.find("li:first").animate({marginTop:"-"+d.options.row_height,},d.options.speed,function(){a(this).detach().css("marginTop","0px").appendTo(d.$el);d.reset_interval()});return false})}if(typeof(d.options.mousestop)!="undefined"&&d.options.mousestop===true){d.$el.mouseenter(function(){d.stop_interval()}).mouseleave(function(){d.start_interval()})}};d.debug_info=function(){console.log(d.options)};d.init()};a.omr.totemticker.defaultOptions={message:"Ticker Loaded",next:null,previous:null,stop:null,start:null,row_height:"100px",speed:800,interval:4000,max_items:null,};a.fn.totemticker=function(b){return this.each(function(){(new a.omr.totemticker(this,b))})}})(jQuery);
+	</script>
+	<script type="text/javascript">
+		$(function(){
+			$('#innerBox').totemticker({
+				row_height	:	'100px',
+				next		:	'#ticker-next',
+				previous	:	'#ticker-previous',
+				stop		:	'#stop',
+				start		:	'#start',
+				mousestop	:	true,
+				speed		: "300", 
+			});
+		});
+	</script>
+
 	<script>
 	var adherenceWindowApproachingCallStatusRenderer = new function(){
 	  this.matches =  function(data){
@@ -45,7 +64,7 @@
 				var d = JSON.parse(data);
 				var renderHTML = render(d);
 				if(renderHTML){
-					var innerHTML = "<div class = 'item'>" + render(d) + "</div>";
+					var innerHTML = "<li class = 'item'>" + render(d) + "</li>";
 					var p = document.createElement('p');
 					var cont = document.createTextNode(innerHTML);
 					p.appendChild(cont);
@@ -77,13 +96,63 @@
 		p {
 			padding:10px 10px;
 		}
+
+
+
+		*{margin:0; padding:0;}
+
+body{
+	font-family:Lucida Grande, Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing:antialiased;
+}
+
+h1.news{
+	overflow:hidden; 
+	text-indent:-9999em; 
+	width:230px; 
+	height:70px;
+	margin:0 auto 15px auto;
+}
+
+	p{color:#333; padding:10px 0; text-align:center;}
+		.nav{}
+	
+	#wrapper a, #footer a{color:#e8914c; text-decoration:none; border-bottom:1px dotted #e8914c;}
+		#wrapper a:hover, #footer a:hover{color:#eab209; border-bottom:1px dotted #eab209;}
+
+#innerBox{
+	height:380px;
+	overflow:hidden;
+	margin:0; padding:0;
+	-webkit-box-shadow:0 1px 3px rgba(0,0,0, .4);
+}
+
+	#innerBox li{
+		padding:35px 20px;
+		display:block;
+		background:#efefef;
+		color:#333;
+		border-bottom:1px solid #ddd;
+		text-align:center;
+		font-size:25px;
+		font-weight:bold;
+		font-family: Helvetica Neue, times, serif;
+	}
 	</style>
 </head>
 <body>
-	<div id="box">
-		<div id="innerBox">
+	<div id="box" class="news">
+		<h1>WHP Events</h1>
+		<br/>
+		<ul id="innerBox">
 
-		</div>
+		</ul>
 	</div>
+		
+		<p><a href="#" id="ticker-previous">Previous</a> / <a href="#" id="ticker-next">Next</a> / <a id="stop" href="#">Stop</a> / <a id="start" href="#">Start</a></p>
+		<p>Roll over the ticker to stop scrolling</p>
+		
+	</div>
+
 </body>
 </html>
