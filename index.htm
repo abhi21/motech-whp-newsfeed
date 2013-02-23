@@ -7,32 +7,67 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+	var adherenceWindowApproachingCallStatusRenderer = new function(){
+	  this.matches =  function(data){
+	    return data.subject && data.subject == 'http_request' && data.parameters.data.reminderType && data.parameters.data.reminderType == 'ADHERENCE_WINDOW_APPROACHING';
+	  }
+	  this.render = function(data){
+		return "Adherence Window Approaching Reminder sent to " + data.parameters.data.providerId + " on " + data.parameters.data.attemptTime;
+	  }
+	};
+
+	var adherenceGivenRenderer = new function(){
+	  this.matches =  function(data){
+	    return data.subject && data.subject == 'http_request' && data.parameters.url.match(/auditlog$/);
+	  }
+	  this.render = function(data){
+		return "Adherence reported for Patient Id:" + data.parameters.data.patientId + " by user:" + data.parameters.data.userId +  " as " +  data.parameters.data.pillStatus + " for " + data.parameters.data.doseDate + " via " + data.parameters.data.channel;
+	  }
+	};
+
+	var adherenceCallLogRenderer = new function(){
+	  this.matches =  function(data){
+	    return data.subject && data.subject == 'http_request' && data.parameters.url.match(/adherenceCallLog/);
+	  }
+	
+	  this.render = function(data){
+		return "Provider: " + data.parameters.data.providerId + " reported adherence for: " + data.parameters.data.adherenceCaptured +  " patients on IVR call that started on " +  data.parameters.data.startTime + " and ended on " + data.parameters.data.endTime;
+	  }
+	};
+	
+	var renderers = []
+	renderers.push(adherenceWindowApproachingCallStatusRenderer);
+	renderers.push(adherenceGivenRenderer);
+	renderers.push(adherenceCallLogRenderer);
+	
 		var socket = io.connect('http://localhost:9000');
 			socket.on('update', function (data) {
 				var d = JSON.parse(data);
-				var innerHTML = render(d);
-				var p = document.createElement('p');
-				var cont = document.createTextNode(innerHTML);
-				p.appendChild(cont);
-				$("#innerBox").prepend(innerHTML);
+				var renderHTML = render(d);
+				if(renderHTML){
+					var innerHTML = "<div class = 'item'>" + render(d) + "</div>";
+					var p = document.createElement('p');
+					var cont = document.createTextNode(innerHTML);
+					p.appendChild(cont);
+					$("#innerBox").prepend(innerHTML);
+				}
 		});
 		
 		function render(data){
-			if(data.subject){ //motech event
-				if(data.subject == 'http_request'){
-					if(data.parameters.data.reminderType && data.parameters.data.reminderType == 'ADHERENCE_WINDOW_APPROACHING'){
-						return "<div>Adherence Window Approaching Reminder sent to " + data.parameters.data.providerId + " on " + data.parameters.data.attemptTime + "</div>";
-					}
+			for(var i=0;i<renderers.length;i++){
+				if(renderers[i].matches(data)){
+					return renderers[i].render(data);
 				}
 			}
 		}
 		
+
 	</script>
 	
 	<style type="text/css" media="screen">
-		* {
-			margin:0px;
-			padding:0px;
+		.item {
+			margin:20px;
+			margin-top:20px;
 		}
 		
 		body {
